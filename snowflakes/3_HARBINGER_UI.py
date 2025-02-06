@@ -155,7 +155,6 @@ if functionality == 'Summary':
             height=400
         )
 
-
 else:
 ##########################
 ##########AD HOC##########
@@ -189,23 +188,54 @@ else:
     def generate_risk_prediction_prompt(cr_data):
         prompt = f"""
                 <role>
-                You are an experienced dev ops professional deeply knowledgeable on computer systems that support a very large company and the metadata that is captured about change requests.
-                A change request is a formal proposal for an alteration to the computer system that you manage.
-                As a dev ops expert, you specialize in using the metadata provided about a change request to predict the liklihood of the change request unintentionally destabalizing the computer system.
-                You are going to be provided with change request meta data as a json object held between <cr_data> and your job is to provide a prediction score and reasoning behind the risk score in the <output> section. 
+                    You are an experienced dev ops professional deeply knowledgeable on computer systems that support a very large company and the metadata that is captured about change requests.
+                    A change request is a formal proposal for an alteration to the computer system that you manage.
+                    As a dev ops expert, you specialize in using the metadata provided about a change request to predict the liklihood of the change request unintentionally destabalizing the computer system.
+                    You are going to be provided with change request meta data as a json object held between <cr_data> and your job is to provide a prediction score and reasoning behind the risk score in the <output> section. 
                 </role>
             
                 <task>: Follow these instructions,
-                1) Considering the <cr_data> and your <role>, provide a risk score between 0 to 5 of this change request destabalizing the computer system when deployed. do not exhibit a bias toward high risk. base your risk score only on the data you have been provided. if there is not enough information, please indicate this. Output this as [Risk_Score]. Then,
-                2) Considering the <cr_data> and your <role>, provide a reasoning for the risk score in as few words as possible while maintaining all detail needed to understand your reasoning. Output this as [Risk_Score_Reason]
+                    1) Considering the <cr_data>, <meta_data>, and your <role>, provide a risk score between 0 to 5 of this change request destabalizing the computer system when deployed. do not exhibit a bias toward high risk. base your risk score only on the data you have been provided. if there is not enough information, please indicate this. Output this as [Risk_Score]. Then,
+                    2) Considering the <cr_data>, <meta_data>, and your <role>, provide a reasoning for the risk score in as few words as possible while maintaining all detail needed to understand your reasoning. Output this as [Risk_Score_Reason]
                 </task>
     
+                <meta_data>
+                    The folowing is the metadata for the cr_data. the metatdata follows this format: (column_name: data_type : description : sample_values):
+                    
+                    (Description: VARCHAR(16777216) : A summary of the change : ''Upgrade to the existing DataSync API from version 3.2 to 3.4 in the Production environment. The update includes several key performance optimizations, enhanced security features, and bug fixes that address issues with data consistency and processing time.
+                    The major components of this change include:
+                    
+                    API Version Update: Migrating from DataSync API v3.2 to v3.4 to support faster data ingestion and processing.
+                    Security Enhancements: Implementation of OAuth 2.0-based authentication to replace the legacy basic authentication mechanism, improving overall security for API transactions.
+                    Error Handling: Enhanced error codes and more descriptive responses for improved debugging in the event of failure.
+                    Database Schema Update: Modifications to the backend MySQL database to accommodate new data types introduced in version 3.4.
+                    Testing will be performed in the staging environment (v3.4-Stage) before deployment to ensure backwards compatibility with existing systems. No downtime is expected during the deployment, but a rollback plan has been prepared in case of critical issues.'',)
+                       
+                    (Date: DATE : The date the request was made : 2025-02-03)
+                    
+                    (Impact: VARCHAR(4000) : How the change will affect the project, including cost, quality, risk, scope, duration, and schedule)
+                    
+                    (Priority: VARCHAR(400) : How quickly the change should be approved and implemented : ''immediately'', ''within release window'', ''after approval'')
+                    
+                    (Risk: VARCHAR(400) : The risk level of the change as described by development team : ''low risk'', ''moderate risk'', ''high risk'')
+                    
+                    (Justification: VARCHAR(4000) : The reason for the change : ''preventative maintenance'', ''patch'', ''planned release as part of project koala'')
+                    
+                    (State: VARCHAR(400) : The status of the change request : ''new'', ''under review'', ''approved'', ''deferred'', ''rejected'')
+                    
+                    (Disposition: VARCHAR(400) : An explanation for approved, deferred, or rejected changes : ''no peer review'', ''manager override'', ''uniform agreement'')
+                    
+                    (Category: VARCHAR(400) : The category of the change : ''planned'', ''unplanned'', ''emergency'')
+                    
+                    (Change number: VARCHAR(100) : A unique ID for tracking the request :''AB1672'', ''723CS'', ''6D62EE'')
+                </meta_data>
+                
                 <cr_data>
-                {cr_data}
+                    {cr_data}
                 </cr_data>
             
                 <Output> 
-                produce valid JSON. Absolutely do not include any additional text before or following the JSON. Output should use following <JSON_format>
+                    produce valid JSON. Absolutely do not include any additional text before or following the JSON. Output should use following <JSON_format>
                 </Output>
                 
                 <JSON_format>
@@ -261,7 +291,7 @@ else:
         #st.markdown('<div class="info-box">', unsafe_allow_html=True)
         # Available models
         models = [
-            'snowflake-arctic', 'claude-3-5-sonnet', 'mistral-large',
+            'claude-3-5-sonnet', 'snowflake-arctic', 'mistral-large',
             'mistral-large2', 'reka-flash', 'reka-core', 'jamba-instruct',
             'jamba-1.5-mini', 'jamba-1.5-large', 'mixtral-8x7b',
             'llama2-70b-chat', 'llama3-8b', 'llama3-70b', 'llama3.1-8b',
