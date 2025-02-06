@@ -19,9 +19,9 @@ functionality = st.sidebar.selectbox('Select Functionlity', ("Summary", "Ad Hoc"
 
 legend_cols = st.sidebar.columns(3)
 with legend_cols[0]:
-    st.color_picker('Low Risk (0-2)', '#00FF00', disabled=True)
+    st.color_picker('Low Risk (0-1.9)', '#00FF00', disabled=True)
 with legend_cols[1]:
-    st.color_picker('Medium Risk (3-4)', '#FFFF00', disabled=True)
+    st.color_picker('Medium Risk (2-3.9)', '#FFFF00', disabled=True)
 with legend_cols[2]:
     st.color_picker('High Risk (4-5)', '#FF0000', disabled=True)
 
@@ -56,13 +56,13 @@ if functionality == 'Summary':
     session = get_active_session()
     database = 'GEN_AI_FSI'
     schema = 'DTCC_HACKATHON'
-    table = 'CHANGE_REQUEST_RISK'
+    table = 'CHANGE_REQUEST_RISK_INFERENCE'
     
     def color_risk_score(val):
         """
         Returns a color based on the risk score value:
-        - Low risk (0-1): Green
-        - Medium risk (2-3): Yellow
+        - Low risk (0-1.9): Green
+        - Medium risk (2-3.9): Yellow
         - High risk (4-5): Red
         """
         if pd.isna(val):
@@ -239,8 +239,8 @@ else:
     # Database configuration
     database = 'GEN_AI_FSI'
     schema = 'DTCC_HACKATHON'
-    table = 'ChangeRequests'
-    history_table = 'CHANGE_REQUEST_RISK'
+    table = 'CHANGE_REQUEST_RAW'
+    history_table = 'CHANGE_REQUEST_RISK_INFERENCE'
     
     # Get the data into pandas
     cr_df = session.table(f"{database}.{schema}.{table}")
